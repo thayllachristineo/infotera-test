@@ -10814,6 +10814,56 @@
         }
       },
       "id": 3
+    },
+    {
+      "hotelId": 17,
+      "roomId": 40,
+      "checkIn": "2026-11-18",
+      "checkOut": "2026-11-23",
+      "rooms": 1,
+      "adults": 2,
+      "children": 0,
+      "guests": [
+        {
+          "firstName": "teste",
+          "lastName": "teste",
+          "email": "teste@teste.com.br",
+          "phone": "(11) 99999-9999"
+        },
+        {
+          "firstName": "teste",
+          "lastName": "teste",
+          "email": "",
+          "phone": ""
+        }
+      ],
+      "totalPrice": 3163,
+      "createdAt": "2026-11-16T23:16:04.480Z",
+      "snapshot": {
+        "hotelName": "Pousada Vista Corcovado",
+        "destination": "Rio de Janeiro, RJ",
+        "address": "Av. Beira-Mar, 1900 - Ipanema, Rio de Janeiro - RJ",
+        "thumbnail": "https://images.unsplash.com/photo-1596436889106-be35e843f974?w=400",
+        "rating": 5,
+        "roomName": "Quarto Standard",
+        "checkInTime": "14:00",
+        "checkOutTime": "12:00",
+        "cancellationPolicy": "moderate",
+        "pricePerNight": 550,
+        "quote": {
+          "nights": 5,
+          "roomCount": 1,
+          "pricePerNight": 550,
+          "base": 2750,
+          "serviceFee": 275,
+          "taxes": 138,
+          "discount": 0,
+          "discountCode": null,
+          "discountLabel": null,
+          "total": 3163
+        }
+      },
+      "id": 4
     }
   ]
 }
