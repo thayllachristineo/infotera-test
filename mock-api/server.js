@@ -24,9 +24,30 @@ const host = arg('host') ?? process.env.HOST ?? 'localhost'
 const delay = Number(arg('delay') ?? process.env.DELAY ?? 300)
 const failRate = Number(arg('fail-rate') ?? process.env.FAIL_RATE ?? 0)
 
-const seedFile = path.join(__dirname, 'db.seed.json')
-const dbFile = path.join(__dirname, 'db.json')
-fs.copyFileSync(seedFile, dbFile)
+function resolveSeed() {
+  const candidates = [
+    path.join(__dirname, 'db.seed.json'),
+    path.join(process.cwd(), 'db.seed.json'),
+    path.join(__dirname, 'db.json'),
+    path.join(process.cwd(), 'db.json'),
+  ]
+  const found = candidates.find(
+    (file) => fs.existsSync(file) && fs.statSync(file).size > 2,
+  )
+  if (!found) {
+    throw new Error(
+      `Banco da mock-api não encontrado. Tentativas: ${candidates.join(', ')}`,
+    )
+  }
+  return found
+}
+
+const seedFile = resolveSeed()
+const dbFile = process.env.VERCEL
+  ? path.join('/tmp', 'db.json')
+  : path.join(__dirname, 'db.json')
+const seed = JSON.parse(fs.readFileSync(seedFile, 'utf8'))
+fs.writeFileSync(dbFile, JSON.stringify(seed))
 
 const stripAccents = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
 
@@ -54,8 +75,12 @@ server.use((req, res, next) => {
   }, requestDelay)
 })
 
-server.use(jsonServer.router(dbFile))
+server.use(jsonServer.router(seed))
 
-server.listen(port, host, () => {
-  console.log(`Mock API em http://${host}:${port} (delay ${delay}ms, fail-rate ${failRate})`)
-})
+if (!process.env.VERCEL) {
+  server.listen(port, host, () => {
+    console.log(`Mock API em http://${host}:${port} (delay ${delay}ms, fail-rate ${failRate})`)
+  })
+}
+
+module.exports = server

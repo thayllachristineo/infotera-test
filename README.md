@@ -49,7 +49,7 @@ Para ver loading, retry e error boundary: `GET /hotels?_delay=3000`, `GET /hotel
 1. `/` — destino com autocomplete (`/suggestions`), datas e hóspedes. Vai para `/search` com a busca na query string.
 2. `/search` — `GET /hotels` com preço, nota, tipo, comodidade, ordenação e página. O total vem de `X-Total-Count`.
 3. `/hotel/[hotelId]` — hotel e quartos em paralelo. "Selecionar" grava a estadia no Zustand e abre o checkout.
-4. `/checkout` — três passos. `POST /bookings`. Sem seleção, volta para a home.
+4. `/checkout` — três passos. A confirmação chama a Server Action `createBookingAction`, que recalcula a cotação e só então faz `POST /bookings`. Sem seleção, volta para a home. "Ler o texto completo" abre o modal de termos; o endereço direto é `/checkout/termos`.
 5. `/confirmation/[bookingId]` — `GET /bookings/:id`. Funciona no reload.
 
 Favoritos ficam em `/favorites`. As últimas reservas deste navegador ficam em `/reservas`.
@@ -62,7 +62,11 @@ Cupons locais, porque a API não tem endpoint de desconto: `ORLA10` (10% nas di�
 
 **Quatro stores, um assunto cada.** Seleção e rascunho, favoritos, memória de busca, toasts. Toast não persiste. Cartão, CVV e documento não entram no `localStorage` nem no `POST`. O número do cartão só passa pelo Luhn no navegador. A API recebe hóspedes, datas, ids e o total.
 
-**Hotel e confirmação no servidor, busca no cliente.** A página do hotel busca hotel e quartos em paralelo (`Promise.all`) e manda isso como `initialData` do TanStack Query, então o HTML já traz o conteúdo e o cache do cliente não refaz a request na hora. `generateMetadata` reutiliza a mesma função com `cache()` do React. Avaliações paginam no cliente, com skeleton próprio, para a ficha não esperar a lista de reviews. A confirmação é um Server Component: o `GET /bookings/:id` roda de novo em todo reload. A busca fica no cliente porque cada filtro muda a URL e o `keepPreviousData` evita apagar a grade enquanto a próxima página chega.
+**Hotel e confirmação no servidor, busca no cliente.** A página do hotel busca hotel e quartos em paralelo e entrega isso como `initialData` do TanStack Query, então o HTML já traz o conteúdo e o cliente não refaz a request na hora. Avaliações paginam no cliente, com skeleton próprio, para a ficha não esperar a lista de reviews. A confirmação lê a reserva no servidor a cada visita, dentro de um Suspense, para o número não ficar preso no cache. A busca fica no cliente porque cada filtro muda a URL e o `keepPreviousData` evita apagar a grade enquanto a próxima página chega.
+
+**Server Action na reserva.** O navegador não monta o `POST`. A action valida o corpo com Zod, recalcula noites e total a partir da diária e do cupom, e descarta cartão, CVV e documento porque esses campos não estão no schema. O TanStack Mutation só guarda o estado de erro e o botão de tentar de novo.
+
+**Cache do Next.** `cacheComponents` liga o Partial Prerendering: home, busca e checkout entregam o casco estático, e o miolo que depende de dados fica num Suspense. O catálogo do hotel usa `use cache` com vida de minutos (`getHotelCatalog` e `getRoomsCatalog`), então a ficha revalida sem um rebuild. Hotéis 1, 2 e 3 saem de `generateStaticParams`. O middleware em `/api/sugestoes` roda na borda e repassa `q` para `/suggestions` da mock-api; o autocomplete da tela continua chamando a API direto.
 
 **Snapshot dentro da reserva.** O json-server não expande hotel nem quarto no `GET /bookings/:id`. O corpo do `POST` inclui um recorte (nome, foto, política, cotação) para a confirmação não depender de um segundo endpoint.
 
@@ -82,6 +86,7 @@ Escolhi o que muda o uso real do fluxo, não a lista inteira.
 - Checkout: três passos, e-mail, telefone BR ou internacional, CPF ou passaporte, Luhn, validade, acompanhantes pelo número de adultos, cotação com breakdown, termos obrigatórios, cupom, erro de submit com retry.
 - Confirmação no servidor, skeletons por rota, error boundary por rota e por seção (galeria, quartos, reviews), `console.error` estruturado em `[orla]`, toasts.
 - Favoritos e histórico de reservas persistidos. Imagens com `next/image` e blur placeholder.
+- Next.js: Partial Prerendering, ISR do catálogo, Server Action na reserva, rota paralela para o modal de termos e middleware na borda para sugestões. Esses pontos deixam o HTML estático onde a página não muda por visitante e mantêm a reserva fora do cache.
 
 ## O que ficou de fora
 
@@ -89,8 +94,7 @@ Escolhi o que muda o uso real do fluxo, não a lista inteira.
 - Ordenação por distância. Não há origem do usuário, só lat/long do hotel.
 - Comparar até 3 hotéis de destinos diferentes. A comparação que existe é entre os quartos do mesmo hotel.
 - i18n, PWA, offline, Framer Motion, mapa com chave de terceiros.
-- Server Actions. A mutação oficial é o `POST` da mock-api; o TanStack Mutation segura o estado de erro e o retry na tela.
-- Deploy. O front está pronto para a Vercel (`NEXT_PUBLIC_API_URL`). A API sobe com o `npm start` de `mock-api` (Render, Railway etc.), como o README de lá descreve.
+- Deploy. O front sobe na Vercel com `NEXT_PUBLIC_API_URL` apontando para a API. A mock-api sobe com a raiz em `mock-api`, build `npm install` e start `npm start`, como na seção "Hospedando a API" de [`mock-api/README.md`](mock-api/README.md). As URLs públicas ainda não existem: a CLI da Vercel neste ambiente está deslogada, e um deploy anônimo expira em uma hora.
 
 ## Uso de IA
 

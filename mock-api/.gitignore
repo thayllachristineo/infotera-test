@@ -7,3 +7,4 @@ pnpm-lock.yaml
 .env
 .env.local
 db.json
+.vercel
