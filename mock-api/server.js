@@ -24,30 +24,17 @@ const host = arg('host') ?? process.env.HOST ?? 'localhost'
 const delay = Number(arg('delay') ?? process.env.DELAY ?? 300)
 const failRate = Number(arg('fail-rate') ?? process.env.FAIL_RATE ?? 0)
 
-function resolveSeed() {
-  const candidates = [
-    path.join(__dirname, 'db.seed.json'),
-    path.join(process.cwd(), 'db.seed.json'),
-    path.join(__dirname, 'db.json'),
-    path.join(process.cwd(), 'db.json'),
-  ]
-  const found = candidates.find(
-    (file) => fs.existsSync(file) && fs.statSync(file).size > 2,
-  )
-  if (!found) {
-    throw new Error(
-      `Banco da mock-api não encontrado. Tentativas: ${candidates.join(', ')}`,
-    )
-  }
-  return found
+// require() entra no bundle da Vercel. Ler o arquivo por caminho dinâmico
+// deixa a função sem o seed, e o json-server responde {} para todo recurso.
+const seed = require('./db.seed.json')
+
+if (!Array.isArray(seed.hotels) || seed.hotels.length === 0) {
+  throw new Error('db.seed.json não tem hotéis.')
 }
 
-const seedFile = resolveSeed()
-const dbFile = process.env.VERCEL
-  ? path.join('/tmp', 'db.json')
-  : path.join(__dirname, 'db.json')
-const seed = JSON.parse(fs.readFileSync(seedFile, 'utf8'))
-fs.writeFileSync(dbFile, JSON.stringify(seed))
+if (!process.env.VERCEL) {
+  fs.writeFileSync(path.join(__dirname, 'db.json'), JSON.stringify(seed))
+}
 
 const stripAccents = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
 

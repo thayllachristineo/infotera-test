@@ -3,6 +3,5 @@
     "server.js": {
       "includeFiles": "db.seed.json"
     }
-  },
-  "rewrites": [{ "source": "/(.*)", "destination": "/api" }]
+  }
 }
