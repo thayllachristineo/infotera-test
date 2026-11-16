@@ -26,10 +26,11 @@ Abra [http://localhost:3000](http://localhost:3000).
 | --- | --- |
 | `npm run dev` | Next.js em desenvolvimento |
 | `npm run dev:api` | mock-api na porta 3333 |
-| `npm test` | Vitest (datas, CPF, Luhn, cotação, schemas, URL) |
+| `npm test` | Vitest: regras de negócio e testes de interface com Testing Library |
 | `npm run lint` | Biome |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run build` | build de produção |
+| `npm run test:e2e` | Cypress. Precisa do front em `localhost:3000` e da API em `3333` |
 
 `.env.example`:
 
@@ -88,7 +89,6 @@ Escolhi o que muda o uso real do fluxo, não a lista inteira.
 - Ordenação por distância. Não há origem do usuário, só lat/long do hotel.
 - Comparar até 3 hotéis de destinos diferentes. A comparação que existe é entre os quartos do mesmo hotel.
 - i18n, PWA, offline, Framer Motion, mapa com chave de terceiros.
-- Testes de componente e E2E. A lógica que erra caro (data, CPF, Luhn, cotação, schema, URL) está no Vitest.
 - Server Actions. A mutação oficial é o `POST` da mock-api; o TanStack Mutation segura o estado de erro e o retry na tela.
 - Deploy. O front está pronto para a Vercel (`NEXT_PUBLIC_API_URL`). A API sobe com o `npm start` de `mock-api` (Render, Railway etc.), como o README de lá descreve.
 
