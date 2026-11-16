@@ -303,7 +303,7 @@ export function HotelDetail({
               <Cancellation policy={hotel.cancellationPolicy} />
             </div>
           </div>
-          <aside className="h-fit rounded-3xl border border-line bg-paper p-4 lg:sticky lg:top-36">
+          <aside className="h-fit w-full min-w-0 rounded-3xl border border-line bg-paper p-4 lg:sticky lg:top-36">
             <h2 className="font-display text-xl">Sua estadia</h2>
             <p className="mt-1 text-sm text-muted">
               {canBook
@@ -312,7 +312,7 @@ export function HotelDetail({
             </p>
             <div className="mt-3">
               <SearchPanel
-                variant="bar"
+                variant="aside"
                 initial={criteria}
                 onSubmit={(values) => {
                   if (values.destination !== hotel.destination) {

@@ -42,7 +42,7 @@ export function SearchPanel({
   onDestinationTextChange,
 }: {
   initial?: SearchCriteria;
-  variant: "hero" | "bar";
+  variant: "hero" | "bar" | "aside";
   onSubmit?: (values: SearchCriteria) => void;
   onDestinationTextChange?: (value: string) => void;
 }) {
@@ -107,8 +107,10 @@ export function SearchPanel({
       <form
         aria-label="Buscar hotéis"
         className={cn(
-          "relative z-20 rounded-3xl bg-paper p-4 text-ink shadow-xl sm:p-5",
-          variant === "bar" && "shadow-none ring-1 ring-line",
+          "@container relative z-20 w-full min-w-0 text-ink",
+          variant === "hero" && "rounded-3xl bg-paper p-4 shadow-xl sm:p-5",
+          variant === "bar" &&
+            "rounded-3xl bg-paper p-4 shadow-none ring-1 ring-line sm:p-5",
         )}
         onSubmit={form.handleSubmit((values) => {
           useSearchMemoryStore.getState().remember(values);
@@ -118,11 +120,17 @@ export function SearchPanel({
       >
         <div
           className={cn(
-            "grid gap-3",
-            variant === "bar"
-              ? "lg:grid-cols-[minmax(0,1.3fr)_auto_auto_minmax(0,1fr)_auto] lg:items-end"
-              : "md:grid-cols-2",
+            "grid w-full min-w-0 gap-3",
+            variant === "hero" && "md:grid-cols-2",
+            variant === "bar" &&
+              "@min-[56rem]:grid-cols-[minmax(0,1.3fr)_minmax(0,10rem)_minmax(0,10rem)_minmax(0,1fr)_auto] @min-[56rem]:items-end",
+            variant === "aside" && "grid-cols-1",
           )}
+          style={
+            variant === "aside"
+              ? { display: "flex", flexDirection: "column", gap: "0.75rem" }
+              : undefined
+          }
         >
           <div className={variant === "hero" ? "md:col-span-2" : undefined}>
             <Controller
@@ -142,7 +150,7 @@ export function SearchPanel({
               )}
             />
           </div>
-          <div>
+          <div className="min-w-0">
             <label
               htmlFor="check-in"
               className="mb-1.5 block text-sm font-medium"
@@ -154,7 +162,11 @@ export function SearchPanel({
               type="date"
               min={today}
               max={checkOut ? shift(checkOut, -1) : undefined}
-              className={cn(controlClass, message("checkIn") && "border-clay")}
+              className={cn(
+                controlClass,
+                "min-w-0",
+                message("checkIn") && "border-clay",
+              )}
               aria-invalid={message("checkIn") ? true : undefined}
               aria-describedby={
                 message("checkIn") ? "check-in-error" : undefined
@@ -171,7 +183,7 @@ export function SearchPanel({
               </p>
             ) : null}
           </div>
-          <div>
+          <div className="min-w-0">
             <label
               htmlFor="check-out"
               className="mb-1.5 block text-sm font-medium"
@@ -183,7 +195,11 @@ export function SearchPanel({
               type="date"
               min={checkIn ? shift(checkIn, 1) : today}
               max={checkIn ? shift(checkIn, 30) : undefined}
-              className={cn(controlClass, message("checkOut") && "border-clay")}
+              className={cn(
+                controlClass,
+                "min-w-0",
+                message("checkOut") && "border-clay",
+              )}
               aria-invalid={message("checkOut") ? true : undefined}
               aria-describedby={
                 message("checkOut") ? "check-out-error" : undefined
@@ -228,7 +244,11 @@ export function SearchPanel({
           <Button
             type="submit"
             size="lg"
-            className={variant === "bar" ? "lg:mb-0" : "md:col-span-2"}
+            className={cn(
+              "w-full",
+              variant === "hero" && "md:col-span-2 md:w-auto",
+              variant === "bar" && "@min-[56rem]:w-auto",
+            )}
           >
             Buscar
           </Button>

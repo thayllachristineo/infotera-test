@@ -80,7 +80,7 @@ export function GuestPicker({
   }, [open]);
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="relative min-w-0">
       <span id={buttonId} className="mb-1.5 block text-sm font-medium">
         Hóspedes
       </span>
