@@ -38,7 +38,7 @@ Abra [http://localhost:3000](http://localhost:3000).
 NEXT_PUBLIC_API_URL=http://localhost:3333
 ```
 
-Não há `localhost` fixo no código. Em produção, troque a variável pela URL pública da API.
+Não há `localhost` fixo no código. Em produção, `NEXT_PUBLIC_API_URL` aponta para a API publicada, sem barra no final.
 
 A mock-api recria `db.json` a partir de `db.seed.json` a cada start. Reservas somem no reinício. Bonito, MS não tem hotel, de propósito. Dois hotéis estão esgotados.
 
@@ -88,14 +88,22 @@ Escolhi o que muda o uso real do fluxo, não a lista inteira.
 - Favoritos e histórico de reservas persistidos. Imagens com `next/image` e blur placeholder.
 - Next.js: Partial Prerendering, ISR do catálogo, Server Action na reserva, rota paralela para o modal de termos e middleware na borda para sugestões. Esses pontos deixam o HTML estático onde a página não muda por visitante e mantêm a reserva fora do cache.
 
+## Deploy
+
+Os dois projetos estão na Vercel, a partir deste repositório.
+
+- Front: [https://infotera-test-front.vercel.app](https://infotera-test-front.vercel.app)
+- API: [https://infotera-test.vercel.app](https://infotera-test.vercel.app)
+
+O front usa a raiz do repositório e `NEXT_PUBLIC_API_URL=https://infotera-test.vercel.app`. A API usa a raiz `mock-api`, build `npm install` e start `npm start`, como na seção "Hospedando a API" de [`mock-api/README.md`](mock-api/README.md). As reservas somem quando a API reinicia.
+
 ## O que ficou de fora
 
 - Virtualização. A página tem 9 cards; o maior destino tem 14 hotéis.
 - Ordenação por distância. Não há origem do usuário, só lat/long do hotel.
 - Comparar até 3 hotéis de destinos diferentes. A comparação que existe é entre os quartos do mesmo hotel.
 - i18n, PWA, offline, Framer Motion, mapa com chave de terceiros.
-- Deploy. O front sobe na Vercel com `NEXT_PUBLIC_API_URL` apontando para a API. A mock-api sobe com a raiz em `mock-api`, build `npm install` e start `npm start`, como na seção "Hospedando a API" de [`mock-api/README.md`](mock-api/README.md). As URLs públicas ainda não existem: a CLI da Vercel neste ambiente está deslogada, e um deploy anônimo expira em uma hora.
 
 ## Uso de IA
 
-Usei o Cursor para implementar o fluxo em cima do contrato da mock-api. As regras de data, documento e preço estão em funções puras com teste, para eu conseguir explicar o comportamento sem depender do que o modelo gerou na interface.
+Usei o Cursor durante a implementação. O modelo escreveu o fluxo em cima do contrato da mock-api, os testes, os ajustes de layout e este README. Eu definia o que entrava, revisava a tela e pedia a correção quando o resultado não batia com o pedido. As regras de data, documento e preço ficaram em funções puras com teste, para eu conseguir explicar o comportamento sem depender do que foi gerado na interface.

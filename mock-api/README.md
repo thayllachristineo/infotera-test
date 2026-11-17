@@ -312,6 +312,8 @@ O serviço define `PORT` e o servidor usa. Depois aponte o front para a URL púb
 
 O CORS já vem liberado. As reservas somem quando o serviço reinicia, e isso é esperado.
 
+Publicada em [https://infotera-test.vercel.app](https://infotera-test.vercel.app).
+
 ---
 
 ## 🚨 Problemas comuns
